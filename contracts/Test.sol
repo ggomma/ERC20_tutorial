@@ -1,13 +1,20 @@
 pragma solidity ^0.5.2;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Pausable.sol';
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import './TokenLock.sol';
 
-contract TEST is ERC20Pausable {
+contract TEST is ERC20Pausable, Ownable {
   string public constant name = "TEST token";
   string public constant symbol = "TEST";
   uint public constant decimals = 18;
   uint public constant INITIAL_SUPPLY = 1000 * (10 ** decimals);
 
+  // Lock
+  mapping (address => address) public lockStatus;
+  event Lock(address _receiver, uint256 _amount);
+
+  // Airdrop
   mapping (address => uint256) public airDropHistory;
   event AirDrop(address _receiver, uint256 _amount);
 
@@ -28,5 +35,13 @@ contract TEST is ERC20Pausable {
 
       emit AirDrop(receiver, amount);
     }
+  }
+
+  function lockToken(address beneficiary, uint256 amount, uint256 releaseTime, bool isOwnable) onlyOwner public {
+    TokenLock lockContract = new TokenLock(this, beneficiary, msg.sender, releaseTime, isOwnable);
+
+    transfer(address(lockContract), amount);
+    lockStatus[beneficiary] = address(lockContract);
+    emit Lock(beneficiary, amount);
   }
 }
