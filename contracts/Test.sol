@@ -1,8 +1,8 @@
 pragma solidity ^0.5.2;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Pausable.sol';
 
-contract TEST is ERC20 {
+contract TEST is ERC20Pausable {
   string public constant name = "TEST token";
   string public constant symbol = "TEST";
   uint public constant decimals = 18;
